@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,7 +10,8 @@ test = pd.read_csv(pwd+'/house-prices-advanced-regression-techniques/train.csv')
 #train.describe() 统计数据
 #print(train.describe())
 
-train5=train.head()
+train5=train[:10]
+test=test[::10]
  # .sort_values 排序
 # print(train5.sort_values(by="SalePrice"))
 print(train5.describe())
@@ -95,8 +95,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 
-
+#分割测试 样本
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=12345)
+
+def rmse(yture,ypredicted):
+    return np.sqrt(mean_squared_error(yture,ypredicted))
+
+#  maxiter最大迭代次数，normalize 归一化
+lasso=Lasso(max_iter=1000,normalize=True)
+
 
 
 

@@ -83,7 +83,7 @@ for i in df[bsmt_cols].select_dtypes(include='object').columns:
     df[i] = df[i].fillna('None')
 
 mas_cols = [col for col in df if col.startswith('Mas')]
-
+df['YrSold'] = df['YrSold'].astype(str)
 # For the numerical features:
 for i in df[mas_cols].select_dtypes(exclude='object').columns:
     df[i] = df[i].fillna(0)
@@ -130,7 +130,7 @@ X.drop(['train'], axis=1, inplace=True)
 test.drop(['train'], axis=1, inplace=True)
 
 
-from sklearn.linear_model import Ridge, RidgeCV, Lasso, LassoCV
+from sklearn.linear_model import  Lasso, LassoCV
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
@@ -147,7 +147,7 @@ def rmse(yture,ypredicted):
 """
 lasso=Lasso(max_iter=100,normalize=True)
 
-lassocv = LassoCV(alphas = None, cv = 10, max_iter = 1000, normalize = True)
+lassocv = LassoCV(alphas = None, cv = 10, max_iter = 100, normalize = True)
 
 lassocv.fit(X_train, y_train)
 

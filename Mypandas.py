@@ -116,7 +116,7 @@ for col in skew_cols.index :
 
 
 
-# 转换 y = log(1+y)
+# 转换 y = log(root+y)
 Y['SalePrice']=np.log1p(Y["SalePrice"])
 
 categ_cols=df.dtypes[df.dtypes==np.dtype]

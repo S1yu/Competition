@@ -3,7 +3,7 @@ from itertools import cycle
 import matplotlib.pyplot as plt
 import numpy
 from sklearn import svm, datasets
-from sklearn.metrics import classification_report, roc_curve, auc, accuracy_score, precision_score,recall_score
+from sklearn.metrics import classification_report, roc_curve, auc, accuracy_score, precision_score,recall_score,f1_score
 from sklearn.model_selection import train_test_split
 import numpy as np
 
@@ -34,8 +34,8 @@ svm=classifier = OneVsRestClassifier(
 # 对超平面的距离
 print(X_train.size,y_train.size,X_test.size)
 y_score = svm.fit(X_train, y_train).decision_function(X_test)
-
-print("SVM : \n "+classification_report(y_test,classifier.predict(X_test))) #打印
+svm_pred=classifier.predict(X_test)
+print("SVM : \n "+classification_report(y_test,svm_pred)) #打印
 
 def print_Roc():
     fpr = dict()
@@ -70,42 +70,66 @@ def print_Roc():
     plt.legend(loc="lower right")
     plt.show()
 
-
 som_modle=som.SOM()
 som_train_data, som_test_data, som_train_labels,som_test_labels = som_modle.get_data()
 som,winmap=som_modle.get_som()
 som_pred_labels = som_modle.classify(som,som_test_data,winmap) #(45*3)
-print("SOM \n"+classification_report(som_test_labels, np.array(som_pred_labels)))
+#print("SOM \n"+classification_report(som_test_labels, np.array(som_pred_labels)))
 
 test_labels=np.eye(3)[som_test_labels]
 pred_labels=np.eye(3)[som_pred_labels]
+print("SOM \n"+classification_report(test_labels,pred_labels))
 
 som_acc=accuracy_score(test_labels,pred_labels)
-svm_acc=accuracy_score(y_test,classifier.predict(X_test))
+svm_acc=accuracy_score(y_test,svm_pred)
 som_precision_mac=[]
 som_recall=[]
+som_F1=[]
 svm_precision_mac=[]
 svm_recall=[]
+svm_F1 = []
 for i in range(3):
-    som_precision_mac.append(precision_score(test_labels[:,i],pred_labels[:,i],average='macro'))
-    som_recall.append(recall_score(test_labels[:,i],pred_labels[:,i],average='macro'))
-    svm_precision_mac.append(precision_score(y_test[:,i],classifier.predict(X_test)[:,i],average='macro'))
-    svm_recall.append(recall_score(y_test[:,i],classifier.predict(X_test)[:,i],average='macro'))
-c=np.c_[np.asarray(som_precision_mac),np.asarray(som_recall)]
+    som_precision_mac.append(precision_score(test_labels[:,i],pred_labels[:,i]))
+    som_recall.append(recall_score(test_labels[:,i],pred_labels[:,i]))
+    som_F1.append(f1_score(test_labels[:,i],pred_labels[:,i]))
+    svm_precision_mac.append(precision_score(y_test[:,i],svm_pred[:,i]))
+    svm_recall.append(recall_score(y_test[:,i],svm_pred[:,i]))
+    svm_F1.append(f1_score(y_test[:,i],svm_pred[:,i]))
+som_precision_mac.append(precision_score(test_labels,pred_labels,average='micro'))
+som_recall.append(recall_score(test_labels,pred_labels,average='micro'))
+som_F1.append(f1_score(test_labels,pred_labels,average='micro'))
+svm_precision_mac.append(precision_score(y_test,svm_pred,average='micro'))
+svm_recall.append(recall_score(y_test,svm_pred,average='micro'))
+svm_F1.append(f1_score(y_test,svm_pred,average='micro'))
 
-tab=plt.table(cellText=c,colWidths=[0.3]*6,loc='center',cellLoc='center',rowLoc='center')
+c=np.c_[np.asarray(som_precision_mac),np.asarray(som_recall),np.asarray(som_F1)]
+c=np.around(c,2)
+d=np.c_[np.asarray(svm_precision_mac),np.asarray(svm_recall),np.asarray(svm_F1)]
+d=np.around(d,2)
+
+
+plt.figure(figsize=(5,5),dpi=150)
+tab=plt.table(cellText=c,colWidths=[0.3]*6,loc='center',cellLoc='center',rowLoc='center'
+              ,rowLabels=["class0","class1","class2","micro"],colLabels=["precision","recall","F1"])
 tab.scale(1,2)
 plt.axis("off")
+plt.title("SOM")
+plt.show()
+
+plt.figure(figsize=(5,5),dpi=150)
+tab=plt.table(cellText=d,colWidths=[0.3]*6,loc='center',cellLoc='center',rowLoc='center'
+              ,rowLabels=["class0","class1","class2","micro"],colLabels=["precision","recall","F1"])
+tab.scale(1,2)
+plt.axis("off")
+plt.title("SVM")
 plt.show()
 
 
 
 
-
-print(accuracy_score(y_test,classifier.predict(X_test))) #预测正确占总比例
-print(accuracy_score(y_test[:,0],classifier.predict(X_test)[:,0])) #预测正确占总比例
-
-print(precision_score(y_test,classifier.predict(X_test),average='micro')) #预测正样本中 正确的比例
+print(accuracy_score(y_test,svm_pred)) #预测正确占总比例
+print(accuracy_score(y_test[:,0],svm_pred[:,0])) #预测正确占总比例
+print(precision_score(y_test,svm_pred,average='micro')) #预测正样本中 正确的比例
 
 
 

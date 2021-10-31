@@ -101,7 +101,6 @@ plt.show()
 
 
 
-
 print(accuracy_score(y_test,classifier.predict(X_test))) #预测正确占总比例
 print(accuracy_score(y_test[:,0],classifier.predict(X_test)[:,0])) #预测正确占总比例
 
